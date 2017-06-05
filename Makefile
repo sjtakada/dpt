@@ -1,6 +1,6 @@
 all: dpt
 
-main.o: main.cpp LdnsQuery.hpp QueryRunner.hpp
+main.o: main.cpp LdnsQuery.hpp QueryRunner.hpp RandomStringGenerator.hpp
 	g++ -c -std=c++11 main.cpp
 
 dpt: main.o

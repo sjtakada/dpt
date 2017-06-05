@@ -5,6 +5,9 @@
 #include <ldns/ldns.h>
 #include <string>
 #include <exception>
+#include "RandomStringGenerator.hpp"
+
+#define RANDOM_DOMAIN_NAME_LENGTH 8
 
 class LdnsQueryDomainException: public std::exception
 {
@@ -74,8 +77,11 @@ public:
   /// Run LDNS query
   int run() {
     ldns_status s;
+    RandomStringGenerator rsg(RANDOM_DOMAIN_NAME_LENGTH);
 
-    domain_ = ldns_dname_new_frm_str(domain_str_.c_str());
+    std::string str = rsg.getString() + domain_str_;
+
+    domain_ = ldns_dname_new_frm_str(str.c_str());
     if (!domain_) {
       throw LdnsQueryDomainException();
     }
