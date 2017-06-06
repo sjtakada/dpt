@@ -108,14 +108,6 @@ public:
 
     std::cout << str << ": ";
     std::cout << "latency " << ms.count() << " ms" << std::endl;
-
-    //    rr_ = ldns_pkt_rr_list_by_type(pkt_, type_,
-    //                                   LDNS_SECTION_ANSWER);
-    //    if (!rr_) {
-    //      throw LdnsQueryRRListException();
-    //    }
-    //
-    //    ldns_rr_list_print(stdout, rr_);
   }
 
 private:
