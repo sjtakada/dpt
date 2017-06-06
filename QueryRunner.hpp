@@ -2,6 +2,8 @@
 #define _DPT_QUERY_RUNNER_HPP
 
 #include <vector>
+#include <chrono>
+#include <thread>
 #include "LdnsQuery.hpp"
 
 /// Query Runner
@@ -13,22 +15,26 @@ public:
   { }
 
   void setDomain(std::string domain) {
-    domains_.push_back(domain);
+    domains_.emplace_back(domain);
   }
 
   void run() {
-    for (DomainVector::const_iterator it = domains_.cbegin();
-         it != domains_.cend(); ++it) {
-      LdnsQuery lq(*it, LDNS_RR_TYPE_A);
+    for (std::size_t i = 0; i < count_; ++i) {
+      for (DomainVector::const_iterator it = domains_.cbegin();
+           it != domains_.cend(); ++it) {
+        LdnsQuery lq(*it, LDNS_RR_TYPE_A);
 
-      // perform DNS query
-      try {
-        lq.run();
-      } catch (std::exception& e) {
-        std::cout << e.what() << std::endl;
-      } catch (...) {
-        std::cout << "other error " << std::endl;
+        // perform DNS query
+        try {
+          lq.run();
+        } catch (std::exception& e) {
+          std::cout << e.what() << std::endl;
+        } catch (...) {
+          std::cout << "other error " << std::endl;
+        }
       }
+      // sleep interval
+      std::this_thread::sleep_for(std::chrono::milliseconds(interval_));
     }
   }
 
