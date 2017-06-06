@@ -5,6 +5,7 @@
 #include <ldns/ldns.h>
 #include <string>
 #include <exception>
+#include <chrono>
 #include "RandomStringGenerator.hpp"
 
 #define RANDOM_DOMAIN_NAME_LENGTH 8
@@ -79,7 +80,7 @@ public:
     ldns_status s;
     RandomStringGenerator rsg(RANDOM_DOMAIN_NAME_LENGTH);
 
-    std::string str = rsg.getString() + domain_str_;
+    std::string str = rsg.getString() + "." + domain_str_;
 
     domain_ = ldns_dname_new_frm_str(str.c_str());
     if (!domain_) {
@@ -91,20 +92,30 @@ public:
       throw LdnsQueryResolverException();
     }
 
+    // record start timestamp
+    auto stime = std::chrono::steady_clock::now();
+
     pkt_ = ldns_resolver_search(res_, domain_, type_,
                                 LDNS_RR_CLASS_IN, LDNS_RD);
-
     if (!pkt_) {
       throw LdnsQuerySearchException();
     }
 
-    rr_ = ldns_pkt_rr_list_by_type(pkt_, type_,
-                                   LDNS_SECTION_ANSWER);
-    if (!rr_) {
-      throw LdnsQueryRRListException();
-    }
+    // record end timestamp
+    auto etime = std::chrono::steady_clock::now();
+    auto diff = etime - stime;
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(diff);
 
-    ldns_rr_list_print(stdout, rr_);
+    std::cout << str << ": ";
+    std::cout << "latency " << ms.count() << " ms" << std::endl;
+
+    //    rr_ = ldns_pkt_rr_list_by_type(pkt_, type_,
+    //                                   LDNS_SECTION_ANSWER);
+    //    if (!rr_) {
+    //      throw LdnsQueryRRListException();
+    //    }
+    //
+    //    ldns_rr_list_print(stdout, rr_);
   }
 
 private:
