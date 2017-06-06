@@ -5,6 +5,7 @@
 #include <chrono>
 #include <thread>
 #include "LdnsQuery.hpp"
+#include "StatsStore.hpp"
 
 /// Query Runner
 class QueryRunner
@@ -19,14 +20,28 @@ public:
   }
 
   void run() {
+    StatsStore ss("dpt", "dpt2017");
+
+    try {
+      ss.connectStore();
+    } catch (std::exception& e) {
+      std::cout << e.what() << std::endl;
+      // won't continue
+      return;
+    }
+
     for (std::size_t i = 0; i < count_; ++i) {
       for (DomainVector::const_iterator it = domains_.cbegin();
            it != domains_.cend(); ++it) {
         LdnsQuery lq(*it, LDNS_RR_TYPE_A);
 
-        // perform DNS query
         try {
-          lq.run();
+          // perform DNS query
+          std::chrono::milliseconds latency_ms = lq.run();
+
+          // update database
+          ss.updateStatsForDomain(*it, latency_ms.count());
+
         } catch (std::exception& e) {
           std::cout << e.what() << std::endl;
         } catch (...) {

@@ -76,7 +76,8 @@ public:
   }
   
   /// Run LDNS query
-  int run() {
+  std::chrono::milliseconds
+  run() {
     ldns_status s;
     RandomStringGenerator rsg(RANDOM_DOMAIN_NAME_LENGTH);
 
@@ -108,6 +109,8 @@ public:
 
     std::cout << str << ": ";
     std::cout << "latency " << ms.count() << " ms" << std::endl;
+
+    return ms;
   }
 
 private:
