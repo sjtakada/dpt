@@ -1,7 +1,10 @@
 #ifndef _DPT_STATS_HPP
 #define _DPT_STATS_HPP
 
+#include <string>
+#include <vector>
 #include <exception>
+#include <cmath>
 #include <mysql++.h>
 
 class StatsStoreConnectException: public std::exception
@@ -87,14 +90,16 @@ private:
 
   // insert record if it does not exist previously
   void insertStats(const std::string& domain, unsigned long latency_ms) {
-    unsigned int count = 1;
+    unsigned int n = 1;
+    double avg = (double)latency_ms;
+    double sn = 0.0;
 
     mysqlpp::Query query = conn_.query();
     query << "INSERT INTO stats VALUES ('"
           << domain << "',"
-          << count << ", "
-          << (double)latency_ms << ", "
-          << "0.0, "
+          << n << ", "
+          << avg << ", "
+          << sn << ", "
           << "NOW(), "
           << "NOW() "
           << ")";
@@ -107,14 +112,19 @@ private:
 
   // update stats
   void updateStats(const std::string& domain, unsigned long latency_ms,
-                   unsigned int count, double avg, double std_deviation) {
-    double avg_new = (avg * count + latency_ms) / (double)(count + 1);
+                   unsigned int n, double avg, double sn) {
+    // calculate standard deviation incrementaly
+    n++;
+    double avg2 = (avg * (n - 1) + latency_ms) / (double)n;
+    double sn2 =
+      std::sqrt(((n - 1) * std::pow(sn, 2) +
+                 (latency_ms - avg) * (latency_ms - avg2)) / n);
 
     mysqlpp::Query query = conn_.query();
     query << "UPDATE stats SET "
-          << "count = " << count + 1 << ", "
-          << "avg = " << avg_new << ", "
-          << "std_deviation = " << "0.0, "
+          << "count = " << n << ", "
+          << "avg = " << avg2 << ", "
+          << "std_deviation = " << sn2 << ", "
           << "last_query = NOW() "
           << "WHERE domain = '" << domain << "'";
     try {
