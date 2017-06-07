@@ -48,7 +48,9 @@ public:
   { }
 
   ~StatsStore() {
-    // should close db connection
+    if (conn_) {
+      conn_.disconnect();
+    }
   }
 
   void connectStore() {
