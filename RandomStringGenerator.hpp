@@ -17,7 +17,7 @@ public:
     : length_(length)
   { }
 
-  std::string getString() {
+  inline std::string getString() {
     std::mt19937 gen(rd_());
     std::uniform_int_distribution<int> dist(0, sizeof(alphanum) - 1);
     std::string str;
