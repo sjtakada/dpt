@@ -15,6 +15,8 @@ void
 StatsStore::updateStatsForDomain(const std::string& domain,
                                  unsigned long latency_ms)
 {
+  // TODO:
+  //    following select and insert/update should be done with transaction
   mysqlpp::Query query = conn_.query();
   query << "SELECT * FROM stats WHERE domain = '" << domain << "'";
 
