@@ -45,7 +45,7 @@ class LdnsQuery
 {
 public:
   /// Ctor
-  LdnsQuery(std::string domain_str, ldns_rr_type type)
+  LdnsQuery(const std::string& domain_str, ldns_rr_type type)
     : domain_str_(domain_str), type_(type), domain_(NULL), res_(NULL),
       pkt_(NULL), rr_(NULL)
   { }

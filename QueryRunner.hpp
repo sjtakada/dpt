@@ -12,7 +12,7 @@ public:
     : count_(count), interval_(interval)
   { }
 
-  void setDomain(std::string domain) {
+  void setDomain(const std::string& domain) {
     domains_.emplace_back(domain);
   }
 

@@ -43,7 +43,7 @@ class StatsStore
 {
 public:
   /// ctor
-  StatsStore(std::string user, std::string passwd)
+  StatsStore(const std::string& user, const std::string& passwd)
     : conn_((_Bool)false), user_(user), passwd_(passwd)
   { }
 
